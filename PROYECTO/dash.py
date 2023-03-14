@@ -65,5 +65,5 @@ def calcular_probabilidad(age, sex, thal, slope, exang, oldpeak, ca, cp):
     q = infer.query(variables=['num'], evidence=evidence)
     prob_enfermedad = q['num'].values[1]
     return prob_enfermedad
-print(calcular_probabilidad(60,1,6,3,1,2,2,4))
+print(calcular_probabilidad(61,1,6,3,1,2,2,4))
 
