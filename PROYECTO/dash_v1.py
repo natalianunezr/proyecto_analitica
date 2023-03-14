@@ -27,12 +27,12 @@ exang = dcc.Input(id='input-exang', type='number', placeholder='Inserte Exang')
 ca = dcc.Input(id='input-ca', type='number', placeholder='Inserte Ca')
 cp = dcc.Input(id='input-cp', type='number', placeholder='Inserte Cp')
 
-# Crear contenedores para el título y subtítulo
+# Crear contenedor para el título
 title_container = html.Div(
-    children=[
-        html.H1(children='Predictor de enfermedades cardíacas - Home Test')
+    children=[        html.Div(children=[            html.H1(children='Predictor de enfermedades cardíacas - Home Test', style={'text-align': 'center'})        ], style={'background-color': 'lightgrey', 'padding': '10px', 'border-radius': '5px'})
     ]
 )
+
 
 #Agrego logo
 image_container = html.Div(
