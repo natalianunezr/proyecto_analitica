@@ -114,6 +114,20 @@ button_container = html.Div(
         html.Br() # Agregar espacio vacío
     ]
 )
+# Cargar la red bayesiana y crear el objeto de inferencia
+from pgmpy.models import BayesianNetwork
+from pgmpy.estimators import MaximumLikelihoodEstimator
+model = BayesianNetwork(
+    [("age_discreta","ca"),
+        ("sex","thal"),
+        ("thal","slope"),
+        ("thal","exang"),
+        ("slope","oldpeak_discreta"),
+        ("oldpeak_discreta","ca"),
+        ("exang","cp"),
+        ("ca","num_discreta"),
+        ("cp","num_discreta"),])
+model.fit(data=df, estimator=MaximumLikelihoodEstimator)
 
 @app.callback(Output('contenedor_resultados', 'children'),
               [Input('boton_calcular', 'n_clicks')],
@@ -126,68 +140,6 @@ button_container = html.Div(
                State('input-ca', 'value'),
                State('input-cp', 'value')])
 
-# Definir función para calcular la probabilidad
-def calcular_probabilidad(age, sex, thal, slope, exang, oldpeak, ca, cp):
-    
-
-    if age >= 29.0 and age < 48:
-        age_discreta = 1
-    if age >= 48 and age < 56:
-        age_discreta = 2   
-    if age >= 56 and age < 61:
-        age_discreta = 3   
-    if age >= 61 and age <= 77:
-        age_discreta = 4         
-
-    
-    # Cargar la red bayesiana y crear el objeto de inferencia
-    from pgmpy.models import BayesianNetwork
-    from pgmpy.estimators import MaximumLikelihoodEstimator
-    model = BayesianNetwork(
-        [("age_discreta","ca"),
-         ("sex","thal"),
-         ("thal","slope"),
-         ("thal","exang"),
-         ("slope","oldpeak_discreta"),
-         ("oldpeak_discreta","ca"),
-         ("exang","cp"),
-         ("ca","num_discreta"),
-         ("cp","num_discreta"),])
-    model.fit(data=df, estimator=MaximumLikelihoodEstimator)
-    infer = VariableElimination(model)
-
-    # Definir la evidencia para las variables
-    evidence = {'age_discreta': age_discreta,
-                'sex': sex,
-                'thal': thal,
-                'slope': slope,
-                'exang': exang,
-                'oldpeak_discreta': oldpeak,
-                'ca': ca,
-                'cp': cp}
-
-    # Calcular la probabilidad de la enfermedad cardíaca (num=1)
-    q = infer.query(variables=['num_discreta'], evidence=evidence)
-    #print(q)
-    prob_enfermedad = q.values.tolist()
-    #return prob_enfermedad #Bota proba de no enfermedad vs enfermedad [0,1]
-    return html.P(f'La probabilidad de enfermedad cardíaca es: {prob_enfermedad[1]:.2f}')
-
-def actualizar_resultados(edad, sex, thal, slope, exang, oldpeak, ca, cp):
-    prob_enfermedad = calcular_probabilidad(
-        float(edad.value),
-        int(sex.value),
-        int(thal.value),        #ERROR EN TODAS, NO SE PUEDE USAR .VALUE CON OBJETO INPUT 
-        int(slope.value),
-        int(exang.value),
-        float(oldpeak.value),
-        int(ca.value),
-        int(cp.value)
-    )
-    return prob_enfermedad
-
-prob_enfermedad = actualizar_resultados(edad, sex, thal, slope, exang, oldpeak, ca, cp)
-resultados_finales = html.Div(id='contenedor_resultados', children=[prob_enfermedad])
 
 # Agregar todo al layout
 app.layout = html.Div(children=[
